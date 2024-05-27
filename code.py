@@ -34,6 +34,9 @@ resistancePot = AnalogIn(board.A1)
 lastResVal = 1
 
 while True:
+    
+    # The below calculates a percentage resistance based on the bike's min/max values
+    '''
     resVal = (round(resistancePot.value/100)) - 166
     # raw value of resistancePot on my bike is about 167 to 587
     # converted above to 1 to 422
@@ -44,10 +47,23 @@ while True:
         display.print(resVal)
         lastResVal = resVal
         print(resVal)
-
+    '''
+    
+    # This calculate estimated Peloton 0-100 resistance instead
+    # accurate(ish) based on power readings for 30 <= P <= 50
+    resVal = resistancePot.value
+    print(resVal)
+    # 3096 is a floor value based on extrapolating down from 30 to 0, and 56690 is a ceiling extrapolated up from 50 to 100
+    # https://docs.google.com/spreadsheets/d/1phBzvnZTu-vwDQL-BnK64fzGEx6X7WDXilE5ZM7WXug/
+    estPval = round(((resVal - 3096)/(56690 - 3096))*100)
+    if (estPval != lastResVal):
+        display.fill(0)
+        display.print(estPval)
+        lastResVal = estPval
+    
     # as we're doing resistance, no need to read too often:
     time.sleep(1)
-    
+
     # the below calculates cadence - not currently used
     '''
     if not cadenceSensor.value:
